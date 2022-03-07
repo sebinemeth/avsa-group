@@ -37,23 +37,23 @@ int main(int argc, char ** argv)
 	//Paths for the dataset
 	// In this example we assume that the dataset is available at
 	// "/home/avsa/datasets/dataset2012lite/dataset/baseline/...
-//	string dataset_path = "/home/avsa/AVSA2020datasets/dataset2012lite/dataset"; //SET THIS DIRECTORY according to your download
-//	string dataset_cat[1] = {"baseline"};
-//	string baseline_seq[4] = {"highway","office","pedestrians","PETS2006"};
-//	string image_path = "/input/in%06d.jpg"; //path to images - this format allows to read consecutive images with filename inXXXXXX.jpq (six digits) starting with 000001
+	string dataset_path = "../dataset2012lite/dataset"; //SET THIS DIRECTORY according to your download
+	string dataset_cat[1] = {"baseline"};
+	string baseline_seq[4] = {"highway","office","pedestrians","PETS2006"};
+	string image_path = "/in%06d.jpg"; //path to images - this format allows to read consecutive images with filename inXXXXXX.jpq (six digits) starting with 000001
 //
-	string dataset_path = "/home/avsa/AVSA2022Datasets/AVSASlidesVideos_dataset"; //SET THIS DIRECTORY according to your download
-	string dataset_cat[1] = {"foregroundSeg"};
-	string baseline_seq[5] = {"hall.avi", "empty_office.avi","stationary_objects.avi","eps_hotstart.avi","eps_shadows.avi"};
+//	string dataset_path = "/home/avsa/AVSA2022Datasets/AVSASlidesVideos_dataset"; //SET THIS DIRECTORY according to your download
+//	string dataset_cat[1] = {"foregroundSeg"};
+//	string baseline_seq[5] = {"hall.avi", "empty_office.avi","stationary_objects.avi","eps_hotstart.avi","eps_shadows.avi"};
 //	string baseline_seq[1] = {"hall.avi"};
-	string image_path = ""; //path to images - this format allows to read consecutive images with filename inXXXXXX.jpq (six digits) starting with 000001
+//	string image_path = ""; //path to images - this format allows to read consecutive images with filename inXXXXXX.jpq (six digits) starting with 000001
 
 // if (argc==3)	{input=argv[3]);}
 
 	//Paths for the results
 	// In this example we assume that the results are stored in the project directory
 	// "/home/avsa/eclipse-workspace/Lab1.1AVSA2020/
-	string project_root_path = "/home/avsa/AVSA2022Results/"; //SET THIS DIRECTORY according to your project
+	string project_root_path = "../"; //SET THIS DIRECTORY according to your project
 	string project_name = "Lab1.1.3"; // project exe name
 	string results_path = project_root_path+"/"+project_name+"/results";
 
