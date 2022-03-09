@@ -1,0 +1,17 @@
+#OVERALL RESULTS
+#A description of the metrics can be found here http://jacarini.dinf.usherbrooke.ca/resultEvaluation/
+#category				video				TP			FN			FN			TN				SE
+baseline            	PETS2006      		3329598		1212490		1498592		365500814		0
+baseline            	highway       		4738874		1561174		719115		85093295		361392
+baseline            	office        		2811646		1446339		5830448		115092347		0
+baseline            	pedestrians   		619466		98745		51396		67470362		12508
+baseline            	ALL SEQUENCES 		11499584	4318748		8099551		633156818		373900
+
+
+Overall             	ALL CATEGORIES		11499584	4318748		8099551		633156818		373900
+
+
+			Recall			Specificity		FPR				FNR				PBC				Precision		FMeasure
+baseline :	0.7016482198	0.9912013373	0.0087986627	0.2983517802	2.3095688852	0.7520216658	0.7111404852
+
+Overall:	0.8246758623	
