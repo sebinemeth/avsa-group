@@ -110,7 +110,7 @@ int main(int argc, char ** argv)
 			int threshold_ghosts2=50; // to set ... //Lab1.1.3
 			bool rgb = true; //true;
 
-			double alpha_sh = 0.5;
+			double alpha_sh = 0.3;
 			double beta_sh = 0.9;
 			int sat_th = 80;
 			int hue_th = 70;
