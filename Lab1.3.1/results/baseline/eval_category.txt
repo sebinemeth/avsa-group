@@ -1,0 +1,11 @@
+#Results for category baseline
+#A description of the metrics can be found here http://jacarini.dinf.usherbrooke.ca/resultEvaluation/
+#category 	video				TP			FP			FN			TN				SE
+baseline 	PETS2006      		3400903		712055		1427287		366001249		0
+baseline 	highway       		4714739		1107653		743250		85546816		359647
+baseline 	office        		2835443		1297420		5806651		115241266		0
+baseline 	pedestrians   		480513		126702		190349		67442405		4388
+baseline 	ALL SEQUENCES 		11431598	3243830		8167537		634231736		364035
+
+Recall			Specificity		FPR				FNR				PBC				Precision		FMeasure
+0.6531417386	0.9930669415	0.0069330585	0.3468582614	2.1812144230	0.7785116250	0.6981217020
