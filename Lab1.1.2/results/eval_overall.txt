@@ -1,6 +1,6 @@
 #OVERALL RESULTS
 #A description of the metrics can be found here http://jacarini.dinf.usherbrooke.ca/resultEvaluation/
-#category				video				TP			FN			FN			TN				SE
+#category				video				TP			FP			FN			TN				SE
 baseline            	PETS2006      		3643750		7306673		1184440		359406631		0
 baseline            	highway       		4711684		2281326		746305		84373143		361301
 baseline            	office        		7554800		3930475		1087294		112608211		0
