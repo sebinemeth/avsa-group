@@ -39,8 +39,8 @@ int main(int argc, char ** argv)
 	// "/home/avsa/datasets/dataset2012lite/dataset/baseline/...
 	string dataset_path = "../dataset2012lite/dataset"; //SET THIS DIRECTORY according to your download
 	string dataset_cat[1] = {"baseline"};
-//	string baseline_seq[4] = {"highway","office","pedestrians","PETS2006"};
-	string baseline_seq[1] = {"highway"};
+	string baseline_seq[4] = {"highway","office","pedestrians","PETS2006"};
+//	string baseline_seq[1] = {"highway"};
 	string image_path = "/in%06d.jpg"; //path to images - this format allows to read consecutive images with filename inXXXXXX.jpq (six digits) starting with 000001
 //
 //	string dataset_path = "/home/avsa/AVSA2022Datasets/AVSASlidesVideos_dataset"; //SET THIS DIRECTORY according to your download
@@ -117,8 +117,8 @@ int main(int argc, char ** argv)
 
 			bool unimodel=true;
 			int init_count = 10;
-			double alpha_g = 0.05;
-			double gauss_th = 6;
+			double alpha_g = 0.1;
+			double gauss_th = 12;
 
 //			fgseg::bgs avsa_bgs(tau, rgb); //construct object of the bgs class
 			//Lab1.1.2
@@ -126,7 +126,7 @@ int main(int argc, char ** argv)
 			//Lab1.1.3
 //			fgseg::bgs avsa_bgs(tau, alpha, selective_bkg_update, threshold_ghosts2, rgb); //construct object of the bgs class
 			//Lab1.3.1
-			//fgseg::bgs avsa_bgs(tau, alpha, selective_bkg_update, threshold_ghosts2, alpha_sh, beta_sh, sat_th, hue_th); //construct object of the bgs class
+//			fgseg::bgs avsa_bgs(tau, alpha, selective_bkg_update, threshold_ghosts2, alpha_sh, beta_sh, sat_th, hue_th); //construct object of the bgs class
 			//Lab1.4.1
 			fgseg::bgs avsa_bgs(tau, alpha, selective_bkg_update, threshold_ghosts2, alpha_sh, beta_sh, sat_th, hue_th, unimodel, init_count, alpha_g, gauss_th, rgb); //construct object of the bgs class
 

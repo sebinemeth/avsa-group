@@ -78,6 +78,11 @@ void bgs::init_bkg(cv::Mat Frame) {
 		_bkg = Frame.clone();
 		cv::absdiff(Frame, _bkg, _diff);
 		_fgcounter = Mat::zeros(Size(Frame.cols, Frame.rows), CV_16UC1);
+
+		_var = Mat::zeros(Size(Frame.cols, Frame.rows), CV_64FC3);
+		_mean = Mat::zeros(Size(Frame.cols, Frame.rows), CV_64FC3);
+		_init_sum = Mat::zeros(Size(Frame.cols, Frame.rows), CV_64FC3);
+		_init_sum_sq = Mat::zeros(Size(Frame.cols, Frame.rows), CV_64FC3);
 	}
 
 }
@@ -235,7 +240,7 @@ void bgs::gaussian(cv::Mat Frame, int it) {
 			} else {
 				for (int i = 0; i < _frame.rows; ++i) {
 					for (int j = 0; j < _frame.cols; ++j) {
-						auto im = _frame.at<uchar>(i, j);
+						auto im = _frame.at<double>(i, j);
 						auto m = _mean.at<double>(i, j);
 						auto s2 = _var.at<double>(i, j);
 						auto d = _frame.at<double>(i, j)
@@ -255,9 +260,51 @@ void bgs::gaussian(cv::Mat Frame, int it) {
 			cout << "not unimodel" << endl;
 			exit(1);
 		}
+		_frame.convertTo(_frame, CV_8UC1);
 	} else {
-		exit(1);
+		if (_unimodel) {
+			Frame.copyTo(_frame);
+			_frame.convertTo(_frame, CV_64FC3);
+			if (it <= _init_count) {
+				// Initialization
+				_init_sum += _frame;
+				_init_sum_sq += _frame.mul(_frame);
+
+				_mean = _init_sum / (double) _init_count;
+				_var = (_init_sum_sq / (double) _init_count) - _mean.mul(_mean);
+			} else {
+				for (int i = 0; i < _frame.rows; ++i) {
+					for (int j = 0; j < _frame.cols; ++j) {
+						auto im = _frame.at<Vec3d>(i, j);
+						auto m = _mean.at<Vec3d>(i, j);
+						auto s2 = _var.at<Vec3d>(i, j);
+						auto d = _frame.at<Vec3d>(i, j) - _mean.at<Vec3d>(i, j);
+
+						bool bg = true;
+						for (int c = 0; c < 3; ++c) {
+							if (fabs(d[c]) < _gauss_th * sqrt(s2[c])) {
+								m[c] = im[c] * _alpha_g
+										+ m[c] * (1.0 - _alpha_g);
+								s2[c] = pow(d[c], 2) * _alpha_g
+										+ s2[c] * (1 - _alpha_g);
+							} else {
+								bg = false;
+							}
+						}
+						if (bg)
+							_bgsmask.at<uchar>(i, j) = 0;
+
+						else
+							_bgsmask.at<uchar>(i, j) = 255;
+
+					}
+				}
+
+			}
+		} else {
+			cout << "not unimodel" << endl;
+			exit(1);
+		}
+		_frame.convertTo(_frame, CV_8UC3);
 	}
-
 }
-
