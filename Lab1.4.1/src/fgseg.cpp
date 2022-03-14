@@ -42,11 +42,13 @@ bgs::bgs(double threshold, double alpha, double selective_bkg_update,
 
 bgs::bgs(double threshold, double alpha, double selective_bkg_update,
 		int threshold_ghosts2, double alpha_sh, double beta_sh, int sat_th,
-		int hue_th, bool unimodel) :
+		int hue_th, bool unimodel, int init_count, double alpha_g,
+		double gauss_th, bool rgb) :
 		_threshold(threshold), _alpha(alpha), _selective_bkg_update(
-				selective_bkg_update), _threshold_ghosts2(threshold_ghosts2), _rgb(
-				false), _alpha_sh(alpha_sh), _beta_sh(beta_sh), _sat_th(sat_th), _hue_th(
-				hue_th), _unimodel(unimodel) {
+				selective_bkg_update), _threshold_ghosts2(threshold_ghosts2), _alpha_sh(
+				alpha_sh), _beta_sh(beta_sh), _sat_th(sat_th), _hue_th(hue_th), _unimodel(
+				unimodel), _init_count(init_count), _alpha_g(alpha_g), _gauss_th(
+				gauss_th), _rgb(rgb) {
 }
 
 //default destructor
@@ -63,10 +65,18 @@ void bgs::init_bkg(cv::Mat Frame) {
 		//ADD YOUR CODE HERE
 		//...
 		_bkg = Frame.clone();
+		cv::absdiff(Frame, _bkg, _diff);
 		_fgcounter = Mat::zeros(Size(Frame.cols, Frame.rows), CV_16UC1);
+
+		_var = Mat::zeros(Size(Frame.cols, Frame.rows), CV_64F);
+		_mean = Mat::zeros(Size(Frame.cols, Frame.rows), CV_64F);
+		_init_sum = Mat::zeros(Size(Frame.cols, Frame.rows), CV_64F);
+		_init_sum_sq = Mat::zeros(Size(Frame.cols, Frame.rows), CV_64F);
+
 		//...
 	} else {
 		_bkg = Frame.clone();
+		cv::absdiff(Frame, _bkg, _diff);
 		_fgcounter = Mat::zeros(Size(Frame.cols, Frame.rows), CV_16UC1);
 	}
 
@@ -169,34 +179,36 @@ void bgs::bkgSubtraction(cv::Mat Frame) {
 //method to detect and remove shadows in the BGS mask to create FG mask
 void bgs::removeShadows() {
 	// init Shadow Mask (currently Shadow Detection not implemented)
-	_shadowmask = Mat::zeros(Size(_frame.cols, _frame.rows), CV_8UC1);
 
 	//ADD YOUR CODE HERE
 	//...
 
 	if (!_rgb) {
-		cout << "not rgb" << endl;
-		exit(1);
-	}
+		_bgsmask.copyTo(_shadowmask);
 
-	cvtColor(_frame, _frame_hsv, COLOR_BGR2HSV);
-	cvtColor(_bkg, _bkg_hsv, COLOR_BGR2HSV);
+		absdiff(_bgsmask, _bgsmask, _shadowmask);
+	} else {
+		_shadowmask = Mat::zeros(Size(_frame.cols, _frame.rows), CV_8UC1);
 
-	for (int i = 0; i < _frame.rows; ++i) {
-		for (int j = 0; j < _frame.cols; ++j) {
-			auto p_bkg = _bkg_hsv.at<Vec3b>(i, j);
-			auto p_frame = _frame_hsv.at<Vec3b>(i, j);
+		cvtColor(_frame, _frame_hsv, COLOR_BGR2HSV);
+		cvtColor(_bkg, _bkg_hsv, COLOR_BGR2HSV);
 
-			auto bh = p_bkg[0], bs = p_bkg[1], bv = p_bkg[2];
-			auto fh = p_frame[0], fs = p_frame[1], fv = p_frame[2];
+		for (int i = 0; i < _frame.rows; ++i) {
+			for (int j = 0; j < _frame.cols; ++j) {
+				auto p_bkg = _bkg_hsv.at<Vec3b>(i, j);
+				auto p_frame = _frame_hsv.at<Vec3b>(i, j);
 
-			auto dh = min(abs(fh - bh), 360 - abs(fh - bh));
+				auto bh = p_bkg[0], bs = p_bkg[1], bv = p_bkg[2];
+				auto fh = p_frame[0], fs = p_frame[1], fv = p_frame[2];
 
-			if (bv != 0 && (fv / (double) bv) >= _alpha_sh
-					&& (fv / (double) bv) <= _beta_sh && abs(fs - bs) <= _sat_th
-					&& dh <= _hue_th
-					&& _bgsmask.at<uchar>(i, j) == 255)
-				_shadowmask.at<uchar>(i, j) = 255;
+				auto dh = min(abs(fh - bh), 360 - abs(fh - bh));
+
+				if (bv != 0 && (fv / (double) bv) >= _alpha_sh
+						&& (fv / (double) bv) <= _beta_sh
+						&& abs(fs - bs) <= _sat_th && dh <= _hue_th
+						&& _bgsmask.at<uchar>(i, j) == 255)
+					_shadowmask.at<uchar>(i, j) = 255;
+			}
 		}
 	}
 	//...
@@ -206,21 +218,46 @@ void bgs::removeShadows() {
 
 //ADD ADDITIONAL FUNCTIONS HERE
 void bgs::gaussian(cv::Mat Frame, int it) {
+	_bgsmask = Mat::zeros(Size(Frame.cols, Frame.rows), CV_8UC1);
 
 	if (!_rgb) {
+		cvtColor(Frame, Frame, COLOR_BGR2GRAY); // to work with gray even if input is color
+		Frame.copyTo(_frame);
+		_frame.convertTo(_frame, CV_64F);
 		if (_unimodel) {
-			cvtColor(Frame, Frame, COLOR_BGR2GRAY); // to work with gray even if input is color
-			Frame.copyTo(_frame);
-		}
-		else{
+			if (it <= _init_count) {
+				// Initialization
+				_init_sum += _frame;
+				_init_sum_sq += _frame.mul(_frame);
+
+				_mean = _init_sum / (double) _init_count;
+				_var = (_init_sum_sq / (double) _init_count) - _mean.mul(_mean);
+			} else {
+				for (int i = 0; i < _frame.rows; ++i) {
+					for (int j = 0; j < _frame.cols; ++j) {
+						auto im = _frame.at<uchar>(i, j);
+						auto m = _mean.at<double>(i, j);
+						auto s2 = _var.at<double>(i, j);
+						auto d = _frame.at<double>(i, j)
+								- _mean.at<double>(i, j);
+
+						if (fabs(d) < _gauss_th * sqrt(s2)) {
+							_bgsmask.at<uchar>(i, j) = 0;
+							m = im * _alpha_g + m * (1.0 - _alpha_g);
+							s2 = pow(d, 2) * _alpha_g + s2 * (1 - _alpha_g);
+						} else {
+							_bgsmask.at<uchar>(i, j) = 255;
+						}
+					}
+				}
+			}
+		} else {
 			cout << "not unimodel" << endl;
 			exit(1);
 		}
-	}
-	else{
+	} else {
 		exit(1);
 	}
-
 
 }
 

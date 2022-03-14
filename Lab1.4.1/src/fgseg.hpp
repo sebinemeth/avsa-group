@@ -32,7 +32,7 @@ namespace fgseg {
 
 		bgs(double threshold, double alpha, double selective_bkg_update, int threshold_ghosts2, double alpha_sh, double beta_sh, int sat_th, int hue_th);
 
-		bgs(double threshold, double alpha, double selective_bkg_update, int threshold_ghosts2, double alpha_sh, double beta_sh, int sat_th, int hue_th, bool unimodel);
+		bgs(double threshold, double alpha, double selective_bkg_update, int threshold_ghosts2, double alpha_sh, double beta_sh, int sat_th, int hue_th, bool unimodel, int init_count, double alpha_g, double gauss_th, bool rgb);
 
 		//destructor
 		~bgs(void);
@@ -93,9 +93,16 @@ namespace fgseg {
 		cv::Mat _frame_hsv;
 		cv::Mat _bkg_hsv;
 
-		cv::Mat _mean_matrix;
-		cv::Mat _variance_matrix;
+		cv::Mat _mean;
+		cv::Mat _var;
 		bool _unimodel;
+
+		int _init_count;
+		cv::Mat _init_sum;
+		cv::Mat _init_sum_sq;
+
+		double _alpha_g;
+		double _gauss_th;
 		//...
 
 	};//end of class bgs
