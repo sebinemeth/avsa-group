@@ -54,12 +54,12 @@ bgs::bgs(double threshold, double alpha, double selective_bkg_update,
 bgs::bgs(double threshold, double alpha, double selective_bkg_update,
 		int threshold_ghosts2, double alpha_sh, double beta_sh, int sat_th,
 		int hue_th, bool unimodel, int init_count, double alpha_g,
-		double gauss_th, int K, double w_th, bool rgb) :
+		double gauss_th, int K, double w_th, double initial_var, bool rgb) :
 		_threshold(threshold), _alpha(alpha), _selective_bkg_update(
 				selective_bkg_update), _threshold_ghosts2(threshold_ghosts2), _alpha_sh(
 				alpha_sh), _beta_sh(beta_sh), _sat_th(sat_th), _hue_th(hue_th), _unimodel(
 				unimodel), _init_count(init_count), _alpha_g(alpha_g), _gauss_th(
-				gauss_th), _K(K), _w_th(w_th), _rgb(rgb) {
+				gauss_th), _K(K), _w_th(w_th), _initial_var(initial_var), _rgb(rgb) {
 }
 
 //default destructor
@@ -277,7 +277,7 @@ void bgs::gaussian(cv::Mat Frame, int it) {
 		} else {
 			if (it == 1) {
 				_mean_mm[0] = _frame;
-				_var_mm[0] = Mat::zeros(Size(Frame.cols, Frame.rows), CV_64F);
+				_var_mm[0] = Mat::ones(Size(Frame.cols, Frame.rows), CV_64F) * _initial_var;
 				_w_mm[0] = Mat::ones(Size(Frame.cols, Frame.rows), CV_64F);
 			}
 			_M_mm = vector<Mat>(_K,
@@ -299,8 +299,8 @@ void bgs::gaussian(cv::Mat Frame, int it) {
 							m = im * _alpha_g + m * (1.0 - _alpha_g);
 							s2 = pow(d, 2) * _alpha_g + s2 * (1 - _alpha_g);
 						}
-						_w_mm_tmp[k].at<double>(i, j) = _w_mm[k].at<double>(i, j)
-								* (1 - _alpha_g)
+						_w_mm_tmp[k].at<double>(i, j) = _w_mm[k].at<double>(i,
+								j) * (1 - _alpha_g)
 								+ ((int) _M_mm[k].at<uchar>(i, j)) * _alpha_g;
 					}
 				}
@@ -309,20 +309,27 @@ void bgs::gaussian(cv::Mat Frame, int it) {
 			for (int i = 0; i < _frame.rows; ++i) {
 				for (int j = 0; j < _frame.cols; ++j) {
 					double sum = 0.0;
+					cout << _w_mm_tmp[0].at<double>(i, j) << " "
+							<< _w_mm_tmp[1].at<double>(i, j) << " "
+							<< _w_mm_tmp[2].at<double>(i, j) << " " << sum
+							<< endl;
 					for (int k = 0; k < _K; ++k)
 						sum += _w_mm_tmp[k].at<double>(i, j);
 					for (int k = 0; k < _K; ++k)
 						_w_mm_tmp[k].at<double>(i, j) /= sum;
+					cout << _w_mm_tmp[0].at<double>(i, j) << " "
+							<< _w_mm_tmp[1].at<double>(i, j) << " "
+							<< _w_mm_tmp[2].at<double>(i, j) << " " << sum
+							<< endl;
 				}
 			}
 
 			for (int i = 0; i < _frame.rows; ++i) {
 				for (int j = 0; j < _frame.cols; ++j) {
 					int min_pos = -1;
-					int min_val = 1;
+					double min_val = 1.0;
 
 					for (int k = 0; k < _K; ++k) {
-						auto w = _w_mm_tmp[k].at<double>(i, j);
 						if (_M_mm[k].at<uchar>(i, j) == 1
 								&& _w_mm_tmp[k].at<double>(i, j)
 										>= (1 - _w_th)) {
@@ -330,7 +337,6 @@ void bgs::gaussian(cv::Mat Frame, int it) {
 							break;
 						}
 						_bgsmask.at<uchar>(i, j) = 255;
-						auto s = _w_mm_tmp[k].at<double>(i, j);
 						if (_w_mm_tmp[k].at<double>(i, j) < min_val) {
 							min_pos = k;
 							min_val = _w_mm_tmp[k].at<double>(i, j);
@@ -338,14 +344,14 @@ void bgs::gaussian(cv::Mat Frame, int it) {
 					}
 					if (_bgsmask.at<uchar>(i, j) == 255) {
 						bool has_match = false;
-						for (int k = 0; !has_match && k < _K; ++k)
+						for (int k = 0; k < _K; ++k)
 							if (_M_mm[k].at<uchar>(i, j) == 1)
 								has_match = true;
 						if (!has_match) {
 							_w_mm_tmp[min_pos].at<double>(i, j) = 0.05;
 							_mean_mm[min_pos].at<double>(i, j) = _frame.at<
 									double>(i, j);
-							_var_mm[min_pos].at<double>(i, j) = 0.0;
+							_var_mm[min_pos].at<double>(i, j) = _initial_var;
 						}
 
 						double sum = 0.0;

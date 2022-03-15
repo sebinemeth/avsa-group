@@ -122,6 +122,7 @@ int main(int argc, char ** argv)
 
 			int K = 3;
 			double w_th = 0.9;
+			double initial_var = 10.0;
 
 //			fgseg::bgs avsa_bgs(tau, rgb); //construct object of the bgs class
 			//Lab1.1.2
@@ -133,7 +134,7 @@ int main(int argc, char ** argv)
 			//Lab1.4.1
 //			fgseg::bgs avsa_bgs(tau, alpha, selective_bkg_update, threshold_ghosts2, alpha_sh, beta_sh, sat_th, hue_th, unimodel, init_count, alpha_g, gauss_th, rgb); //construct object of the bgs class
 			//Lab1.5.1
-			fgseg::bgs avsa_bgs(tau, alpha, selective_bkg_update, threshold_ghosts2, alpha_sh, beta_sh, sat_th, hue_th, unimodel, init_count, alpha_g, gauss_th, K, w_th, rgb); //construct object of the bgs class
+			fgseg::bgs avsa_bgs(tau, alpha, selective_bkg_update, threshold_ghosts2, alpha_sh, beta_sh, sat_th, hue_th, unimodel, init_count, alpha_g, gauss_th, K, w_th, initial_var, rgb); //construct object of the bgs class
 
 			// END - TO CHANGE FOR DIFF PROJECTS
 
