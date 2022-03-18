@@ -53,7 +53,16 @@ int main(int argc, char ** argv)
 		string dataset_path = "../Lab2datasets/"; //SET THIS DIRECTORY according to your download
 		string dataset_cat[1] = {""};
 		//string baseline_seq[10] = {"AVSS2007/AVSSS07_EASY.mkv","AVSS2007/AVSSS07_HARD.mkv", "ETRI/ETRI_od_a.avi", "PETS2006/PETS2006_S1/PETS2006_S1_C3.mpeg","PETS2006/PETS2006_S4/PETS2006_S4_C3.avi","PETS2006/PETS2006_S5/PETS2006_S5_C3.mpeg","VISOR/visor_Video00.avi","VISOR/visor_Video01.avi","VISOR/visor_Video02.avi","VISOR/visor_Video03.avi"};
-		string baseline_seq[8] = {"ETRI/ETRI_od_A.avi","PETS2006/PETS2006_S1/PETS2006_S1_C3.mpeg","PETS2006/PETS2006_S4/PETS2006_S4_C3.avi","PETS2006/PETS2006_S5/PETS2006_S5_C3.mpeg","VISOR/visor_Video00.avi","VISOR/visor_Video01.avi","VISOR/visor_Video02.avi","VISOR/visor_Video03.avi"};
+		string baseline_seq[1] = {
+				"ETRI/ETRI_od_A.avi"
+//				"PETS2006/PETS2006_S1/PETS2006_S1_C3.mpeg",
+////				"PETS2006/PETS2006_S4/PETS2006_S4_C3.avi",
+//				"PETS2006/PETS2006_S5/PETS2006_S5_C3.mpeg",
+//				"VISOR/visor_Video00.avi",
+//				"VISOR/visor_Video01.avi",
+//				"VISOR/visor_Video02.avi",
+//				"VISOR/visor_Video03.avi"
+		};
 		string image_path = ""; //path to images - this format allows to read consecutive images with filename inXXXXXX.jpq (six digits) starting with 000001
 
 //		// "/home/avsa/datasets/dataset2012lite/dataset/baseline/...
