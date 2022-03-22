@@ -199,8 +199,13 @@ int main(int argc, char ** argv)
 
 				string title= project_name + " | Frame - FgM - Stat FgM | Blobs - Classes - Stat Classes | BlobsFil - ClassesFil - Stat ClassesFil | ("+dataset_cat[c] + "/" + baseline_seq[s] + ")";
 
+				auto paintedLabelled = paintBlobImage(frame,bloblistFiltered, true);
+				stringstream it_ss;
+				it_ss << setw(6) << setfill('0') << it;
+				string filename = results_path + "/" + it_ss.str() + ".png";
+				imwrite(filename, paintedLabelled);
 				ShowManyImages(title, 6, frame, fgmask, sfgmask,
-						paintBlobImage(frame,bloblistFiltered, false), paintBlobImage(frame,bloblistFiltered, true), paintBlobImage(frame,sbloblistFiltered, true));
+						paintBlobImage(frame,bloblistFiltered, false), paintedLabelled, paintBlobImage(frame,sbloblistFiltered, true));
 
 				//exit if ESC key is pressed
 				if(waitKey(30) == 27) break;

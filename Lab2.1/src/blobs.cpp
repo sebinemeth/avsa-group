@@ -197,8 +197,7 @@ int classifyBlobs(std::vector<cvBlob> &bloblist) {
 	//...
 
 	//classify each blob of the list
-	for (int i = 0; i < bloblist.size(); i++) {
-		cvBlob blob = bloblist[i]; //get i-th blob
+	for (cvBlob &blob : bloblist) {
 		//...
 		double ar = blob.w / (double) blob.h;
 
@@ -208,6 +207,8 @@ int classifyBlobs(std::vector<cvBlob> &bloblist) {
 			blob.label = CAR;
 		if (fabs(MEAN_OBJECT - ar) <= STD_OBJECT)
 			blob.label = OBJECT;
+
+		int p = 2;
 
 		// void implementation (does not change label -at creation UNKNOWN-)
 	}
