@@ -189,36 +189,29 @@ float WED(float val1, float val2, float std) {
 	return sqrt(pow(val1 - val2, 2) / pow(std, 2));
 }
 //end distances
-int classifyBlobs(std::vector<cvBlob> &bloblist) {
-	//check input conditions and return -1 if any is not satisfied
-	//...
+int classifyBlobs(std::vector<cvBlob> &bloblist)
+ {
+ 	//check input conditions and return -1 if any is not satisfied
+ 	//...
 
-	//required variables for classification
-	//...
+ 	//required variables for classification
+ 	//...
 
-	//classify each blob of the list
-	for (cvBlob &blob : bloblist) {
-		//...
-		double ar = blob.w / (double) blob.h;
+ 	//classify each blob of the list
+ 	for(int i = 0; i < bloblist.size(); i++)
+ 	{
+ 		cvBlob blob = bloblist[i]; //get i-th blob
+ 		//...
 
-		if (fabs(MEAN_PERSON - ar) <= STD_PERSON)
-			blob.label = PERSON;
-		if (fabs(MEAN_CAR - ar) <= STD_CAR)
-			blob.label = CAR;
-		if (fabs(MEAN_OBJECT - ar) <= STD_OBJECT)
-			blob.label = OBJECT;
+ 		// void implementation (does not change label -at creation UNKNOWN-)
+ 	}
 
-		int p = 2;
+ 	//destroy all resources
+ 	//...
 
-		// void implementation (does not change label -at creation UNKNOWN-)
-	}
-
-	//destroy all resources
-	//...
-
-	//return OK code
-	return 1;
-}
+ 	//return OK code
+ 	return 1;
+ }
 
 //stationary blob extraction function
 /**
