@@ -8,6 +8,8 @@
  */
 
 #include "blobs.hpp"
+#include "math.h"
+
 
 /**
  *	Draws blobs with different rectangles on the image 'frame'. All the input arguments must be
@@ -236,10 +238,10 @@ int classifyBlobs(std::vector<cvBlob> &bloblist) {
  */
 
 #define FPS 25 //check in video - not really critical
-#define SECS_STATIONARY 0 // to set
-#define I_COST 0 // to set // increment cost for stationarity detection
-#define D_COST 0 // to set // decrement cost for stationarity detection
-#define STAT_TH 0.0 // to set
+#define SECS_STATIONARY 2 // to set
+#define I_COST 1 // to set // increment cost for stationarity detection
+#define D_COST 15 // to set // decrement cost for stationarity detection
+#define STAT_TH 0.1 // to set
 
 int extractStationaryFG(Mat fgmask, Mat &fgmask_history, Mat &sfgmask) {
 
@@ -249,14 +251,23 @@ int extractStationaryFG(Mat fgmask, Mat &fgmask_history, Mat &sfgmask) {
 	for (int i = 0; i < fgmask.rows; i++)
 		for (int j = 0; j < fgmask.cols; j++) {
 			// ...
-			fgmask_history.at<float>(i, j) = 0; // void implementation (no history)
-		} //for
+			int is_fg = fgmask.at<uchar>(i, j) == 255;
+			if (is_fg)
+				fgmask_history.at<float>(i, j) += I_COST * is_fg;
+			else
+				fgmask_history.at<float>(i, j) =
+						std::max(0.0f, fgmask_history.at<float>(i, j) - D_COST * (1 - is_fg));
+		}
 
-		// update sfgmask
+	// update sfgmask
 	for (int i = 0; i < fgmask.rows; i++)
 		for (int j = 0; j < fgmask.cols; j++) {
 			// ...
-			sfgmask.at<uchar>(i, j) = 0; // void implementation (no stationary fg)
+			auto val = std::min(1.0f, fgmask_history.at<float>(i, j) / numframes4static);
+			if (val >= STAT_TH)
+				sfgmask.at<uchar>(i, j) = 255;
+			else
+				sfgmask.at<uchar>(i, j) = 0;
 		}
 	return 1;
 }

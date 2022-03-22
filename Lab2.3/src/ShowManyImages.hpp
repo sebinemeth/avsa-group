@@ -15,7 +15,7 @@
 
 using namespace std;
 
-void ShowManyImages(string title, int nArgs, ...);
+cv::Mat ShowManyImages(string title, int nArgs, ...);
 
 
 #endif /* SRC_SHOWMANYIMAGES_HPP_ */

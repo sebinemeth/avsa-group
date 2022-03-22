@@ -54,11 +54,11 @@ int main(int argc, char ** argv)
 		string dataset_cat[1] = {""};
 		//string baseline_seq[10] = {"AVSS2007/AVSSS07_EASY.mkv","AVSS2007/AVSSS07_HARD.mkv", "ETRI/ETRI_od_a.avi", "PETS2006/PETS2006_S1/PETS2006_S1_C3.mpeg","PETS2006/PETS2006_S4/PETS2006_S4_C3.avi","PETS2006/PETS2006_S5/PETS2006_S5_C3.mpeg","VISOR/visor_Video00.avi","VISOR/visor_Video01.avi","VISOR/visor_Video02.avi","VISOR/visor_Video03.avi"};
 		string baseline_seq[1] = {
-				"ETRI/ETRI_od_A.avi"
+//				"ETRI/ETRI_od_A.avi"
 //				"PETS2006/PETS2006_S1/PETS2006_S1_C3.mpeg",
 ////				"PETS2006/PETS2006_S4/PETS2006_S4_C3.avi",
 //				"PETS2006/PETS2006_S5/PETS2006_S5_C3.mpeg",
-//				"VISOR/visor_Video00.avi",
+				"VISOR/visor_Video00.avi",
 //				"VISOR/visor_Video01.avi",
 //				"VISOR/visor_Video02.avi",
 //				"VISOR/visor_Video03.avi"
@@ -203,10 +203,10 @@ int main(int argc, char ** argv)
 				stringstream it_ss;
 				it_ss << setw(6) << setfill('0') << it;
 				string filename = results_path + "/" + it_ss.str() + ".png";
-				imwrite(filename, paintedLabelled);
-				ShowManyImages(title, 6, frame, fgmask, sfgmask,
+//				imwrite(filename, paintedLabelled);
+				auto manyImages = ShowManyImages(title, 6, frame, fgmask, sfgmask,
 						paintBlobImage(frame,bloblistFiltered, false), paintedLabelled, paintBlobImage(frame,sbloblistFiltered, true));
-
+				imwrite(filename, manyImages);
 				//exit if ESC key is pressed
 				if(waitKey(30) == 27) break;
 				it++;

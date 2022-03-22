@@ -68,7 +68,7 @@ cegparamesh[at]gmail[dot]com
 ...
 ///////////////////////////////////////////////////////////////////////*/
 
-void ShowManyImages(string title, int nArgs, ...) {
+cv::Mat ShowManyImages(string title, int nArgs, ...) {
 int size;
 int i;
 int m, n;
@@ -86,11 +86,11 @@ int max;
 // return without displaying
 if(nArgs <= 0) {
     printf("ShowManyImages(): Number of arguments too small....\n");
-    return;
+    return cv::Mat();
 }
 else if(nArgs > 14) {
     printf("ShowManyImages(): Number of arguments too large, can only handle maximally 12 images at a time ...\n");
-    return;
+    return cv::Mat();
 }
 // Determine the size of the image,
 // and the number of rows/cols
@@ -136,7 +136,7 @@ for (i = 0, m = 20, n = 20; i < nArgs; i++, m += (20 + size)) {
     // If it is NULL, release the image, and return
     if(ori.empty()) {
         printf("ShowManyImages(): Invalid arguments");
-        return;
+        return cv::Mat();
     }
 
     // add-on (josemm.martinez@uam.es 202002)
@@ -185,6 +185,7 @@ imshow( title, DispImage);
 
 // End the number of arguments
 va_end(args);
+return DispImage;
 }
 
 
