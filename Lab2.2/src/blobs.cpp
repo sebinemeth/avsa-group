@@ -188,6 +188,15 @@ float ED(float val1, float val2) {
 float WED(float val1, float val2, float std) {
 	return sqrt(pow(val1 - val2, 2) / pow(std, 2));
 }
+// helper struct containing the relative distance from a CLASS mean
+struct dfromcls {
+	CLASS cls;
+	float d;
+	// implement comparison operator to be able to run a minimum search on it
+	bool operator<(dfromcls dfc) {
+		return d < dfc.d;
+	}
+};
 //end distances
 int classifyBlobs(std::vector<cvBlob> &bloblist) {
 	//check input conditions and return -1 if any is not satisfied
@@ -199,14 +208,18 @@ int classifyBlobs(std::vector<cvBlob> &bloblist) {
 	//classify each blob of the list
 	for (cvBlob &blob : bloblist) {
 		//...
-		double ar = blob.w / (double) blob.h;
+		double ar = blob.w / (double) blob.h; // aspect ration
+		std::vector<dfromcls> v = {{UNKNOWN, 1e10f}}; // vector containing distances from valid classes
 
-		if (fabs(MEAN_PERSON - ar) <= STD_PERSON)
-			blob.label = PERSON;
-		if (fabs(MEAN_CAR - ar) <= STD_CAR)
-			blob.label = CAR;
-		if (fabs(MEAN_OBJECT - ar) <= STD_OBJECT)
-			blob.label = OBJECT;
+		if (ED(MEAN_PERSON, ar) <= STD_PERSON)
+			v.push_back({PERSON, WED(MEAN_PERSON, ar, STD_PERSON)});
+		if (ED(MEAN_CAR, ar) <= STD_CAR)
+			v.push_back({CAR, WED(MEAN_CAR, ar, STD_CAR)});
+		if (ED(MEAN_OBJECT, ar) <= STD_OBJECT)
+			v.push_back({OBJECT, WED(MEAN_OBJECT, ar, STD_OBJECT)});
+
+		auto it = std::min_element(v.begin(), v.end()); // find CLASS with smallest relative distance
+		blob.label = it->cls;
 
 		// void implementation (does not change label -at creation UNKNOWN-)
 	}
