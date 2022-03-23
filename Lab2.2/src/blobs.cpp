@@ -201,14 +201,12 @@ int classifyBlobs(std::vector<cvBlob> &bloblist) {
 		//...
 		double ar = blob.w / (double) blob.h;
 
-		if (ED(MEAN_PERSON, ar) <= STD_PERSON)
+		if (fabs(MEAN_PERSON - ar) <= STD_PERSON)
 			blob.label = PERSON;
-		if (ED(MEAN_CAR, ar) <= STD_CAR)
+		if (fabs(MEAN_CAR - ar) <= STD_CAR)
 			blob.label = CAR;
-		if (ED(MEAN_OBJECT, ar) <= STD_OBJECT)
+		if (fabs(MEAN_OBJECT - ar) <= STD_OBJECT)
 			blob.label = OBJECT;
-
-		int p = 2;
 
 		// void implementation (does not change label -at creation UNKNOWN-)
 	}
