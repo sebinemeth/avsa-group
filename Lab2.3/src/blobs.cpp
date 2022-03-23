@@ -203,11 +203,11 @@ int classifyBlobs(std::vector<cvBlob> &bloblist) {
 		//...
 		double ar = blob.w / (double) blob.h;
 
-		if (fabs(MEAN_PERSON - ar) <= STD_PERSON)
+		if (ED(MEAN_PERSON, ar) <= STD_PERSON)
 			blob.label = PERSON;
-		if (fabs(MEAN_CAR - ar) <= STD_CAR)
+		if (ED(MEAN_CAR, ar) <= STD_CAR)
 			blob.label = CAR;
-		if (fabs(MEAN_OBJECT - ar) <= STD_OBJECT)
+		if (ED(MEAN_OBJECT, ar) <= STD_OBJECT)
 			blob.label = OBJECT;
 
 		int p = 2;
@@ -238,10 +238,10 @@ int classifyBlobs(std::vector<cvBlob> &bloblist) {
  */
 
 #define FPS 25 //check in video - not really critical
-#define SECS_STATIONARY 2 // to set
-#define I_COST 1 // to set // increment cost for stationarity detection
-#define D_COST 15 // to set // decrement cost for stationarity detection
-#define STAT_TH 0.1 // to set
+#define SECS_STATIONARY 1.5 // to set
+#define I_COST 1.0f // to set // increment cost for stationarity detection
+#define D_COST 3.0f // to set // decrement cost for stationarity detection
+#define STAT_TH 0.5 // to set
 
 int extractStationaryFG(Mat fgmask, Mat &fgmask_history, Mat &sfgmask) {
 
