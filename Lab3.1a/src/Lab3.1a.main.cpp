@@ -64,14 +64,14 @@ int main(int argc, char ** argv)
 		MOG2->apply(frame, bgMask, 0.005);
 		
 		// perform opening morph operation
-		int morph_elem = 0;
 		int morph_size = 2;
 		cv::threshold(bgMask, opening, 200, 255, CV_THRESH_BINARY); // do not consider shadows
 		morphologyEx(opening, opening, MORPH_OPEN,
-				getStructuringElement(morph_elem, Size(2*morph_size+1,2*morph_size+1), Point(morph_size,morph_size)));
+				getStructuringElement(MORPH_RECT, Size(2*morph_size+1,2*morph_size+1), Point(morph_size,morph_size)));
 
 		// blob detection
 		Mat blobSep = extractBlobs(opening, bloblist, 4);
+		removeSmallBlobs(bloblist, bloblist, 2, 2);
 
 		// save blobs
 		Point cp;
