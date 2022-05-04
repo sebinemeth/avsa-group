@@ -23,7 +23,7 @@ int main(int argc, char ** argv)
 {
 	int count=0;		 											    // frame counter
 	Mat frame;														    // frame of the video sequence
-	std::string inputvideo = "../dataset_lab3/lab3.1/singleball.mp4"; 	// path for the video to process
+	std::string inputvideo = "../dataset_lab3/lab3.2/video2.mp4"; 	// path for the video to process
 
 	Mat bgMask, opening, detectionhistimg;
 	vector<cvBlob> bloblist;
@@ -76,7 +76,7 @@ int main(int argc, char ** argv)
 
 		// blob detection
 		extractBlobs(opening, bloblist, 4);
-		removeSmallBlobs(bloblist, bloblist, 2, 2);
+		removeSmallBlobs(bloblist, bloblist, 50, 50);
 
 		// save blobs
 		Point cp;
@@ -88,6 +88,7 @@ int main(int argc, char ** argv)
 		} else {
 			cp = Point(-100,-100);
 		}
+		cout << cp << endl;
 		resultfile << cp.x << " " << cp.y << endl;
 		detectionhistory.push_back(cp);
 
@@ -101,7 +102,6 @@ int main(int argc, char ** argv)
 
 		kalman->run(cp);
 
-
 		//display frame (YOU MAY ADD YOUR OWN VISUALIZATION FOR MEASUREMENTS, AND THE STAGES IMPLEMENTED)
 		std::ostringstream str;
 		str << std::setfill('0') << std::setw(3) << count;
@@ -109,12 +109,15 @@ int main(int argc, char ** argv)
 		putText(bgMask,"Background mask", cvPoint(30,30),FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
 		putText(opening,"After opening", cvPoint(30,30),FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
 		putText(detectionhistimg,"Detection history", cvPoint(30,30),FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
+		Mat kalmanImage = kalman->print(detectionhistory, frame);
 
-		Mat manyimages = ShowManyImages("Frames", 6, frame, bgMask, opening, paintBlobImage(frame, bloblist, false), detectionhistimg, kalman->print(detectionhistory, frame));
+		Mat manyimages = ShowManyImages("Frames", 6, frame, bgMask, opening, paintBlobImage(frame, bloblist, false), detectionhistimg, kalmanImage);
 		stringstream count_ss;
 		count_ss << setw(6) << setfill('0') << count;
 		string filename = results_path + "/frame" + count_ss.str() + ".png";
 		imwrite(filename, manyimages);
+
+		imwrite("./video2-6-measnoise5.jpg", kalmanImage);
 
 		//cancel execution by pressing "ESC"
 		if( (char)waitKey(100) == 27)

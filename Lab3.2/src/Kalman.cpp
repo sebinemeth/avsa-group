@@ -17,36 +17,63 @@ Kalman::Kalman(int statesize, Mat &frame) :
 		stateSize(statesize), detected(false), frameSize(frame.size()) {
 	kalmanFilter = KalmanFilter(stateSize, 2, 0);
 
-	int NOISE_COV = 25;
+	int MEAS_NOISE_COV = 5;
+	int PROC_NOISE_COV = 25;
+	int PROC_VELOCITY = 10;
+
+	setIdentity(kalmanFilter.errorCovPost, Scalar::all(1e5));  //P
 
 	if (stateSize == 4) //constant velocity
 			{
 		kalmanFilter.transitionMatrix = (Mat_<float>(stateSize, stateSize) << //A
-				1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1);
+				1, 1, 0, 0, //
+				0, 1, 0, 0, //
+				0, 0, 1, 1, //
+				0, 0, 0, 1);
 
-		kalmanFilter.processNoiseCov = (Mat_<float>(stateSize, stateSize) << //Q
-				NOISE_COV, 0, 0, 0, 0, 10, 0, 0, 0, 0, NOISE_COV, 0, 0, 0, 0, 10);
+		kalmanFilter.processNoiseCov =
+				(Mat_<float>(stateSize, stateSize) << //Q
+						PROC_NOISE_COV, 0, 0, 0, //
+						0, PROC_VELOCITY, 0, 0, //
+						0, 0, PROC_NOISE_COV, 0, //
+						0, 0, 0, PROC_VELOCITY);
 
 		kalmanFilter.measurementMatrix = (Mat_<float>(2, stateSize) << //H
-				1, 0, 0, 0, 0, 0, 1, 0);
+				1, 0, 0, 0, //
+				0, 0, 1, 0);
+
+		//kalmanFilter.errorCovPost.at<float>(0,0) = 25;
+		//kalmanFilter.errorCovPost.at<float>(2,2) = 25;
 	}
 
 	if (stateSize == 6) //constant acceleration
 			{
-		kalmanFilter.transitionMatrix =
-				(Mat_<float>(stateSize, stateSize) << //A
-						1, 1, 0.5f, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0.5f, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1);
+		kalmanFilter.transitionMatrix = (Mat_<float>(stateSize, stateSize) << //A
+				1, 1, 0.5f, 0, 0, 0, //
+				0, 1, 1, 0, 0, 0, //
+				0, 0, 1, 0, 0, 0, //
+				0, 0, 0, 1, 1, 0.5f, //
+				0, 0, 0, 0, 1, 1, //
+				0, 0, 0, 0, 0, 1);
 
 		kalmanFilter.processNoiseCov =
 				(Mat_<float>(stateSize, stateSize) << //Q
-						NOISE_COV, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, NOISE_COV, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 1, 0, 0, 0, 0);
+						PROC_NOISE_COV, 0, 0, 0, 0, 0, //
+						0, PROC_VELOCITY, 0, 0, 0, 0, //
+						0, 0, 1, 0, 0, 0, //
+						0, 0, 0, PROC_NOISE_COV, 0, 0, //
+						0, 0, 0, 0, PROC_VELOCITY, 0, //
+						0, 0, 0, 0, 0, 1);
 
 		kalmanFilter.measurementMatrix = (Mat_<float>(2, stateSize) << //H
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
+				1, 0, 0, 0, 0, 0, //
+				0, 0, 0, 1, 0, 0);
+
+//		kalmanFilter.errorCovPost.at<float>(0,0) = 15;
+//		kalmanFilter.errorCovPost.at<float>(3,3) = 15;
 	}
 
-	setIdentity(kalmanFilter.measurementNoiseCov, Scalar::all(NOISE_COV)); //R
-	setIdentity(kalmanFilter.errorCovPost, Scalar::all(1e-5));  //P
+	setIdentity(kalmanFilter.measurementNoiseCov, Scalar::all(MEAS_NOISE_COV)); //R
 
 }
 
@@ -91,6 +118,7 @@ void Kalman::run(cv::Point meas) {
 			//cout<<"Detected, there is an observation"<<endl;
 		}
 	}
+	cout << out_points.size() << " " << out_points[out_points.size() - 1] << endl;
 }
 
 Mat Kalman::print(vector<Point> &meas_history, Mat &frame) {
@@ -100,9 +128,10 @@ Mat Kalman::print(vector<Point> &meas_history, Mat &frame) {
 			FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 0, 0), 1, CV_AA);
 	putText(out_frame, "Estimated x_k ", cvPoint(30, 70),
 			FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 255), 1, CV_AA);
-	for (int j = 0; j < out_points.size(); j++) {
-		drawMarker(out_frame, meas_history[j], cvScalar(255, 0, 0),
-				MARKER_CROSS, 20, 2); //display measurement
+	for (unsigned int j = 0; j < out_points.size(); j++) {
+		if (meas_history[j].x > 0 && meas_history[j].y > 0)
+			drawMarker(out_frame, meas_history[j], cvScalar(255, 0, 0),
+					MARKER_CROSS, 20, 2); //display measurement
 		drawMarker(out_frame, out_points[j], cvScalar(0, 0, 255), MARKER_CROSS,
 				20, 2); //display estimations
 	}
