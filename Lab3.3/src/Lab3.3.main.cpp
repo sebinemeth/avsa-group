@@ -80,7 +80,7 @@ int main(int argc, char ** argv)
 
 		// save blobs
 		Point cp;
-		if (bloblist.size() > 0 && count > 1) {
+		if (bloblist.size() > 0) {
 			cvBlob max_blob = maxBlob(bloblist);
 			std::cout << max_blob.w << "x" << max_blob.h << " " <<
 					     max_blob.x << "," << max_blob.y << std::endl;
