@@ -38,19 +38,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: Lab3.1a
+all: Lab3.2
 
 # Tool invocations
-Lab3.1a: $(OBJS) $(USER_OBJS)
+Lab3.2: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/opt/installation/OpenCV-3.4.4/lib -o "Lab3.1a" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/opt/installation/OpenCV-3.4.4/lib -o "Lab3.2" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) Lab3.1a
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) Lab3.2
 	-@echo ' '
 
 .PHONY: all clean dependents
