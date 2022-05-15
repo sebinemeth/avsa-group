@@ -86,7 +86,7 @@ int main(int argc, char ** argv)
 
 			rp.generateCandidates(list_bbox_gt[frame_idx-1], frame.size());
 			for (auto box : rp.getCandidates()) {
-				rectangle(frame, box, Scalar(255, 0, 255));
+				rectangle(frame, box, Scalar(200, 0, 200));
 			}
 
 			rp.matchCandidates(frame, list_bbox_gt[frame_idx-1]);

@@ -34,12 +34,12 @@ void RegionProposal::matchCandidates(cv::Mat image, cv::Rect templ) {
 	image.convertTo(image, CV_32FC1);
 
 	for (size_t i = 0; i < _candidates.size(); ++i) {
-		cv::Mat result;
+		cv::Mat score;
 		cv::Mat template_patch = image(templ);
 		cv::Mat candidate_patch = image(_candidates[i]);
-		result.create(1, 1, CV_32FC1);
-		cv::matchTemplate(candidate_patch, template_patch, result, CV_TM_CCORR);
-		_candidateScores.push_back(result.at<float>(0));
+		score.create(1, 1, CV_32FC1);
+		cv::matchTemplate(candidate_patch, template_patch, score, CV_TM_CCOEFF_NORMED);
+		_candidateScores.push_back(score.at<float>(0));
 	}
 	return;
 }
