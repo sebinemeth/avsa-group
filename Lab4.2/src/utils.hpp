@@ -16,6 +16,7 @@
 #include <opencv2/opencv.hpp>
 
 std::vector<cv::Rect> readGroundTruthFile(std::string groundtruth_path);
-std::vector<float> estimateTrackingPerformance(std::vector<cv::Rect> Bbox_GT, std::vector<cv::Rect> Bbox_est);
+std::vector<float> estimateTrackingPerformance(std::vector<cv::Rect> Bbox_GT,
+		std::vector<cv::Rect> Bbox_est);
 
 #endif /* UTILS_HPP_ */

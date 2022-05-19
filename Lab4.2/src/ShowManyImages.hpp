@@ -17,5 +17,4 @@ using namespace std;
 
 cv::Mat ShowManyImages(string title, int nArgs, ...);
 
-
 #endif /* SRC_SHOWMANYIMAGES_HPP_ */

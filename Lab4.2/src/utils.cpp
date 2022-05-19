@@ -28,8 +28,7 @@ using namespace std;
  * @param ground_truth_path: full path to ground truth text file
  * @return bbox_list: list of ground truth bounding boxes of class Rect
  */
-std::vector<Rect> readGroundTruthFile(std::string groundtruth_path)
-{
+std::vector<Rect> readGroundTruthFile(std::string groundtruth_path) {
 	// variables for reading text file
 	ifstream inFile; //file stream
 	string bbox_values; //line of file containing all bounding box data
@@ -38,23 +37,24 @@ std::vector<Rect> readGroundTruthFile(std::string groundtruth_path)
 	vector<Rect> bbox_list; //output with all read bounding boxes
 
 	// open text file
-	inFile.open(groundtruth_path.c_str(),ifstream::in);
-	if(!inFile)
-		throw runtime_error("Could not open groundtrutfile " + groundtruth_path); //throw error if not possible to read file
+	inFile.open(groundtruth_path.c_str(), ifstream::in);
+	if (!inFile)
+		throw runtime_error(
+				"Could not open groundtrutfile " + groundtruth_path); //throw error if not possible to read file
 
 	// Read each line of groundtruth file
-	while(getline(inFile, bbox_values)){
+	while (getline(inFile, bbox_values)) {
 
 		stringstream linestream(bbox_values); //convert read line to linestream
 		//cout << "-->lineread=" << linestream.str() << endl;
 
 		// Read comma separated values of groundtruth.txt
-		vector<int> x_values,y_values; 	//values to be read from line
-		int line_ctr = 0;						//control variable to read alternate Xi,Yi
-		while(getline(linestream, bbox_value, ',')){
+		vector<int> x_values, y_values; 	//values to be read from line
+		int line_ctr = 0;			//control variable to read alternate Xi,Yi
+		while (getline(linestream, bbox_value, ',')) {
 
 			//read alternate Xi,Yi coordinates
-			if(line_ctr%2 == 0)
+			if (line_ctr % 2 == 0)
 				x_values.push_back(stoi(bbox_value));
 			else
 				y_values.push_back(stoi(bbox_value));
@@ -65,11 +65,13 @@ std::vector<Rect> readGroundTruthFile(std::string groundtruth_path)
 		double xmin = *min_element(x_values.begin(), x_values.end()); //x coordinate of the top-left corner
 		double ymin = *min_element(y_values.begin(), y_values.end()); //y coordinate of the top-left corner
 
-		if (xmin < 0) xmin=0;
-		if (ymin < 0) ymin=0;
+		if (xmin < 0)
+			xmin = 0;
+		if (ymin < 0)
+			ymin = 0;
 
 		double width = *max_element(x_values.begin(), x_values.end()) - xmin; //width
-		double height = *max_element(y_values.begin(), y_values.end()) - ymin;//height
+		double height = *max_element(y_values.begin(), y_values.end()) - ymin; //height
 
 		// Initialize a cv::Rect for a bounding box and store it in a std<vector> list
 		bbox_list.push_back(Rect(xmin, ymin, width, height));
@@ -102,17 +104,16 @@ std::vector<Rect> readGroundTruthFile(std::string groundtruth_path)
  * 		- Only estimated Bboxes are compared, so groundtruth Bbox can be
  * 		a list larger than the list of estimated Bboxes.
  */
-std::vector<float> estimateTrackingPerformance(std::vector<cv::Rect> Bbox_GT, std::vector<cv::Rect> Bbox_est)
-{
+std::vector<float> estimateTrackingPerformance(std::vector<cv::Rect> Bbox_GT,
+		std::vector<cv::Rect> Bbox_est) {
 	vector<float> score;
 
 	//For each data, we compute the IOU criteria for all estimations
-	for(int f=0;f<(int)Bbox_est.size();f++)
-	{
-		Rect m_inter = Bbox_GT[f] & Bbox_est[f];//Intersection
-		Rect m_union = Bbox_GT[f] | Bbox_est[f];//Union
+	for (int f = 0; f < (int) Bbox_est.size(); f++) {
+		Rect m_inter = Bbox_GT[f] & Bbox_est[f]; //Intersection
+		Rect m_union = Bbox_GT[f] | Bbox_est[f]; //Union
 
-		score.push_back((float)m_inter.area()/(float)m_union.area());
+		score.push_back((float) m_inter.area() / (float) m_union.area());
 	}
 
 	return score;
