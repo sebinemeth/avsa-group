@@ -47,6 +47,26 @@ public:
 		_bbox = bbox;
 	}
 
+	bool isColFeatures() const {
+		return _col_features;
+	}
+
+	ColorFeature getColorFeature() const {
+		return _colorFeature;
+	}
+
+	int getCount() const {
+		return _count;
+	}
+
+	int getBins() const {
+		return _n_bins;
+	}
+
+	int getStep() const {
+		return _step;
+	}
+
 private:
 	cv::Size _frameSize;
 	int _count;

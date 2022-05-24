@@ -19,6 +19,7 @@
 #include "utils.hpp" 							//for functions readGroundTruthFile & estimateTrackingPerformance
 #include "ShowManyImages.hpp"
 #include "Tracker.hpp"
+#include <sstream>
 
 //namespaces
 using namespace cv;
@@ -32,15 +33,26 @@ int main(int argc, char **argv) {
 	std::string output_path = "../outvideos/";	//location to save output videos
 
 	// dataset paths
-	std::string sequences[] = { "bolt1" };										//test data for lab4.1, 4.3 & 4.5
-//	std::string sequences[] = { "sphere","car1" };								//test data for lab4.2
-//	std::string sequences[] = { "ball2","basketball" };							//test data for lab4.4
+//	std::string sequences[] = { "bolt1" };										//test data for lab4.1, 4.3 & 4.5
+
+//	std::string sequences[] = { "car1" };										//test data for lab4.2
+//	std::string sequences[] = { "sphere" };										//test data for lab4.2
+
+//	std::string sequences[] = { "basketball" };									//test data for lab4.4
+	std::string sequences[] = { "ball2" };										//test data for lab4.4
+
 //	std::string sequences[] = { "bag","ball","road" };							//test data for lab4.6
 	std::string image_path = "%08d.jpg"; 	//format of frames. DO NOT CHANGE
 	std::string groundtruth_file = "groundtruth.txt"; //file for ground truth data. DO NOT CHANGE
 	int NumSeq = sizeof(sequences) / sizeof(sequences[0]);//number of sequences
 
 	Tracker *tracker = nullptr;
+
+	const int COUNT            = 6;
+	const int STEP             = 3;
+	const int N_BINS           = 16;
+	const bool IS_COLOR        = false;
+	const ColorFeature CHANNEL = GRAY;
 
 	//Loop for all sequence of each category
 	for (int s = 0; s < NumSeq; s++) {
@@ -89,7 +101,7 @@ int main(int argc, char **argv) {
 			//...
 
 			if (tracker == nullptr)
-				tracker = new Tracker(frame.size(), 4, 3, 16, false, GRAY);
+				tracker = new Tracker(frame.size(), COUNT, STEP, N_BINS, IS_COLOR, CHANNEL);
 
 			//conversion
 			Mat converted_frame = tracker->convert(frame);
@@ -155,6 +167,19 @@ int main(int argc, char **argv) {
 //
 //			string frame_filename = "./results/"+color+"/" + "frame_" + std::to_string(frame_idx-1) + ".png";
 //			imwrite(frame_filename, frame);
+
+			stringstream frame_idx_ss;
+			frame_idx_ss << setw(6) << setfill('0') << frame_idx;
+			string folder = "results/" + sequences[s]
+									   + "_b" + to_string(tracker->getBins())
+									   + "_c" + to_string(tracker->getCount())
+									   + "_s" + to_string(tracker->getStep())
+									   + "_col" + to_string(tracker->getColorFeature())
+									   + "_t" + to_string(tracker->isColFeatures()) + "/";
+			system(("mkdir -p " + folder).c_str());
+			string filename = folder + frame_idx_ss.str() + ".jpg";
+			if (frame_idx % 10 == 0)
+				imwrite(filename, manyimages);
 
 			//exit if ESC key is pressed
 			if (waitKey(30) == 27)
